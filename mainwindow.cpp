@@ -2,22 +2,7 @@
 
 MainWindow::MainWindow()
 {
-    QFrame *frame = new QFrame;
-    QHBoxLayout *frameLayout = new QHBoxLayout(frame);
-    list_view_1 = new QListView();
-    list_view_2 = new QListView();
-    lst << "123" << "234" << "345";
-    list = new QStringListModel(this);
-    my_list = new MyStringListModel(this);
-    //list->setStringList(lst);
-    my_list->setStringList(lst);
-    list_view_1->setModel(my_list);
-    list_view_2->setModel(list);
-    frameLayout->addWidget(list_view_1);
-    frameLayout->addWidget(list_view_2);
-
-    setCentralWidget(frame);
-
+    tuneWindow();
     createActions();
     setCurrentFile(QString());
 }
@@ -40,8 +25,6 @@ void MainWindow::loadFile(const QString &file_name)
     setCurrentFile(file_name);
     file.close();
 }
-
-
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
@@ -81,11 +64,6 @@ bool MainWindow::saveAs()
     return saveFile(dialog.selectedFiles().first());
 }
 
-void MainWindow::documentWasModified()
-{
-
-}
-
 void MainWindow::createActions()
 {
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
@@ -107,6 +85,20 @@ void MainWindow::createActions()
     openAct->setStatusTip(tr("Save current file as..."));
     connect(saveAsAct, &QAction::triggered, this, &MainWindow::saveAs);
     fileMenu->addAction(saveAsAct);
+}
+
+void MainWindow::tuneWindow()
+{
+    QFrame *frame = new QFrame;
+    QHBoxLayout *frameLayout = new QHBoxLayout(frame);
+    list_view = new QListView();
+    list = new QStringListModel(this);
+    list_view->setModel(list);
+    frameLayout->addWidget(list_view);
+    setCentralWidget(frame);
+    setMinimumSize(400, 500);
+
+    connect(list, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)), this, SLOT(save()));
 }
 
 bool MainWindow::changesSaved()
